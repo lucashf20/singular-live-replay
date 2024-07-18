@@ -4,13 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Overlay de Replay</title>
+    <style>
+        body { margin: 0; }
+        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+    </style>
 </head>
 <body>
-    <h1>Overlay de Replay</h1>
-    <div id="player">
-        <!-- Aqui você pode inserir o player de vídeo para o replay em loop -->
-        <!-- Exemplo: -->
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ youtubeId }}?autoplay=1&loop=1&mute=1" frameborder="0" allowfullscreen></iframe>
-    </div>
+    <div id="player"></div>
+
+    <script>
+        function getReplayUrl(youtubeId) {
+            return `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&mute=1&playlist=${youtubeId}&start=${Math.floor((new Date().getTime() / 1000) - 8)}`;
+        }
+
+        function loadPlayer() {
+            var youtubeId = sessionStorage.getItem('youtubeId');
+            if (youtubeId) {
+                var iframe = document.createElement('iframe');
+                iframe.src = getReplayUrl(youtubeId);
+                document.getElementById('player').appendChild(iframe);
+            } else {
+                alert('ID da transmissão não encontrado!');
+            }
+        }
+
+        loadPlayer();
+        setInterval(loadPlayer, 8000);  // Atualiza o player a cada 8 segundos
+    </script>
 </body>
 </html>
+
