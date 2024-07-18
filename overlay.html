@@ -13,12 +13,24 @@
     <div id="player"></div>
 
     <script>
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i=0; i<vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return(false);
+        }
+
         function getReplayUrl(youtubeId) {
             return `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&mute=1&playlist=${youtubeId}&start=${Math.floor((new Date().getTime() / 1000) - 8)}`;
         }
 
         function loadPlayer() {
-            var youtubeId = sessionStorage.getItem('youtubeId');
+            var youtubeId = getQueryVariable('youtubeId');
             if (youtubeId) {
                 var iframe = document.createElement('iframe');
                 iframe.src = getReplayUrl(youtubeId);
@@ -33,4 +45,5 @@
     </script>
 </body>
 </html>
+
 
