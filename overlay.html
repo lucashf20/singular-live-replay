@@ -13,27 +13,23 @@
     <div id="player"></div>
 
     <script>
-        function getReplayUrl(youtubeId, startTime) {
-            var currentTime = Math.floor(new Date().getTime() / 1000);
-            var start = Math.floor((currentTime - startTime / 1000) - 8);
-            return `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&mute=1&playlist=${youtubeId}&start=${start}`;
-        }
-
-        function loadPlayer() {
-            var youtubeId = localStorage.getItem('youtubeId');
-            var replayStartTime = localStorage.getItem('replayStartTime');
+        async function loadPlayer() {
+            var response = await fetch('https://mint-traveling-appendix.glitch.me/get-replay');
+            var data = await response.json();
+            var youtubeId = data.youtubeId;
+            var replayStartTime = data.startTime;
             var playerDiv = document.getElementById('player');
             playerDiv.innerHTML = '';  // Limpa qualquer iframe anterior
 
             if (youtubeId && replayStartTime) {
+                var currentTime = Math.floor(new Date().getTime() / 1000);
+                var start = Math.floor((currentTime - replayStartTime / 1000) - 8);
                 var iframe = document.createElement('iframe');
-                iframe.src = getReplayUrl(youtubeId, replayStartTime);
+                iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&mute=1&playlist=${youtubeId}&start=${start}`;
                 iframe.onload = function () {
                     iframe.style.display = 'block';
                     setTimeout(function () {
                         iframe.style.display = 'none';
-                        localStorage.removeItem('youtubeId');
-                        localStorage.removeItem('replayStartTime');
                     }, 8000);  // Esconde após 8 segundos
                 };
                 playerDiv.appendChild(iframe);
@@ -51,6 +47,7 @@
     </script>
 </body>
 </html>
+
 
 
 
