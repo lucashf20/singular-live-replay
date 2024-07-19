@@ -13,38 +13,30 @@
     <div id="player"></div>
 
     <script>
-        function getQueryVariable(variable) {
-            var query = window.location.search.substring(1);
-            var vars = query.split("&");
-            for (var i = 0; i < vars.length; i++) {
-                var pair = vars[i].split("=");
-                if (pair[0] == variable) {
-                    return pair[1];
-                }
-            }
-            return(false);
-        }
-
-        function getReplayUrl(youtubeId) {
-            return `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&mute=1&playlist=${youtubeId}&start=${Math.floor((new Date().getTime() / 1000) - 8)}`;
+        function getReplayUrl(youtubeId, startTime) {
+            var currentTime = Math.floor(new Date().getTime() / 1000);
+            var start = Math.floor((currentTime - startTime / 1000) - 8);
+            return `https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&mute=1&playlist=${youtubeId}&start=${start}`;
         }
 
         function loadPlayer() {
-            var youtubeId = getQueryVariable('youtubeId');
+            var youtubeId = localStorage.getItem('youtubeId');
+            var replayStartTime = localStorage.getItem('replayStartTime');
             var playerDiv = document.getElementById('player');
             playerDiv.innerHTML = '';  // Limpa qualquer iframe anterior
 
-            if (youtubeId) {
+            if (youtubeId && replayStartTime) {
                 var iframe = document.createElement('iframe');
-                iframe.src = getReplayUrl(youtubeId);
+                iframe.src = getReplayUrl(youtubeId, replayStartTime);
                 iframe.onload = function () {
                     iframe.style.display = 'block';
                     setTimeout(function () {
                         iframe.style.display = 'none';
-                        window.location.href = 'overlay.html';  // Volta para a tela transparente
                     }, 8000);  // Esconde após 8 segundos
                 };
                 playerDiv.appendChild(iframe);
+            } else {
+                alert('ID da transmissão ou hora de início do replay não encontrados!');
             }
         }
 
@@ -52,6 +44,7 @@
     </script>
 </body>
 </html>
+
 
 
 
