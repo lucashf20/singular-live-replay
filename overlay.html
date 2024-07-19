@@ -32,18 +32,27 @@
                     iframe.style.display = 'block';
                     setTimeout(function () {
                         iframe.style.display = 'none';
+                        localStorage.removeItem('youtubeId');
+                        localStorage.removeItem('replayStartTime');
                     }, 8000);  // Esconde após 8 segundos
                 };
                 playerDiv.appendChild(iframe);
             } else {
-                alert('ID da transmissão ou hora de início do replay não encontrados!');
+                playerDiv.innerHTML = '';  // Limpa o player se não houver replay ativo
             }
         }
 
-        loadPlayer();
+        function checkForUpdates() {
+            loadPlayer();
+            setTimeout(checkForUpdates, 1000);  // Verifica a cada segundo
+        }
+
+        checkForUpdates();
     </script>
 </body>
 </html>
+
+
 
 
 
