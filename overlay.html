@@ -26,33 +26,29 @@
 
   <script>
     let player;
+    let replayData = {};
 
     function onYouTubeIframeAPIReady() {
-      setTimeout(fetchReplayData, 1000); // Aguarda 1 segundo para garantir que a API esteja carregada
+      setInterval(fetchReplayData, 1000);
     }
 
     function fetchReplayData() {
-      fetch('https://mint-traveling-appendix.glitch.me/get-replay')
-        .then(response => response.json())
-        .then(data => {
-          if (data.youtubeId) {
-            if (!player) {
-              initializePlayer(data.youtubeId, data.startTime);
-            } else {
-              player.loadVideoById({
-                videoId: data.youtubeId,
-                startSeconds: data.startTime,
-                endSeconds: parseInt(data.startTime) + 8
-              });
-            }
+      const storedData = localStorage.getItem('replayData');
+      if (storedData) {
+        const data = JSON.parse(storedData);
+        if (data.youtubeId !== replayData.youtubeId || data.startTime !== replayData.startTime) {
+          replayData = data;
+          if (!player) {
+            initializePlayer(replayData.youtubeId, replayData.startTime);
           } else {
-            setTimeout(fetchReplayData, 1000);
+            player.loadVideoById({
+              videoId: replayData.youtubeId,
+              startSeconds: replayData.startTime,
+              endSeconds: parseInt(replayData.startTime) + 8
+            });
           }
-        })
-        .catch(error => {
-          console.error('Error fetching replay data:', error);
-          setTimeout(fetchReplayData, 1000);
-        });
+        }
+      }
     }
 
     function initializePlayer(videoId, startTime) {
@@ -79,7 +75,6 @@
       event.target.setVolume(0);
     }
 
-    // Load the IFrame Player API code asynchronously.
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -87,6 +82,7 @@
   </script>
 </body>
 </html>
+
 
 
 
