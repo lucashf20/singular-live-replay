@@ -51,7 +51,7 @@
     }
 
     function fetchReplayData() {
-      fetch('/get-replay')
+      fetch('https://mint-traveling-appendix.glitch.me/get-replay')
         .then(response => response.json())
         .then(data => {
           if (data.youtubeId) {
