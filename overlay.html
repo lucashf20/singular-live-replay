@@ -1,52 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overlay de Replay</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: transparent;
-        }
-        #player {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overlay</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+    }
+    #player {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 <body>
-    <div id="player"></div>
+  <div id="player"></div>
 
-    <script>
-        async function fetchReplayData() {
-            const response = await fetch('https://mint-traveling-appendix.glitch.me/get-replay');
-            const data = await response.json();
-            return data;
+  <script>
+    let player;
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '100%',
+        width: '100%',
+        videoId: '',
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          modestbranding: 1,
+          loop: 1,
+          mute: 1
+        },
+        events: {
+          'onReady': onPlayerReady
         }
+      });
+    }
 
-        function updatePlayer(youtubeId) {
-            const player = document.getElementById('player');
-            player.innerHTML = `
-                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/${youtubeId}?autoplay=1&loop=1&mute=1" frameborder="0" allowfullscreen></iframe>
-            `;
-        }
+    function onPlayerReady(event) {
+      event.target.setVolume(0);
+      fetchReplayData();
+    }
 
-        async function checkForReplay() {
-            const data = await fetchReplayData();
-            if (data.youtubeId) {
-                updatePlayer(data.youtubeId);
-            }
-        }
+    function fetchReplayData() {
+      fetch('/get-replay')
+        .then(response => response.json())
+        .then(data => {
+          if (data.youtubeId) {
+            player.loadVideoById({
+              videoId: data.youtubeId,
+              startSeconds: data.startTime,
+              endSeconds: parseInt(data.startTime) + 8
+            });
+          } else {
+            setTimeout(fetchReplayData, 1000);
+          }
+        });
+    }
 
-        setInterval(checkForReplay, 5000);
-    </script>
+    // Load the IFrame Player API code asynchronously.
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  </script>
 </body>
 </html>
+
 
 
 
