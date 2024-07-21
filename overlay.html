@@ -26,29 +26,22 @@
 
   <script>
     let player;
-    let replayData = {};
+    const overlayURL = 'https://lucashf20.github.io/singular-live-replay/api/start-replay.json';
 
     function onYouTubeIframeAPIReady() {
-      setInterval(fetchReplayData, 1000);
+      fetchReplayData();
     }
 
     function fetchReplayData() {
-      const storedData = localStorage.getItem('replayData');
-      if (storedData) {
-        const data = JSON.parse(storedData);
-        if (data.youtubeId !== replayData.youtubeId || data.startTime !== replayData.startTime) {
-          replayData = data;
-          if (!player) {
-            initializePlayer(replayData.youtubeId, replayData.startTime);
+      fetch(overlayURL)
+        .then(response => response.json())
+        .then(data => {
+          if (data.youtubeId) {
+            initializePlayer(data.youtubeId, data.startTime);
           } else {
-            player.loadVideoById({
-              videoId: replayData.youtubeId,
-              startSeconds: replayData.startTime,
-              endSeconds: parseInt(replayData.startTime) + 8
-            });
+            setTimeout(fetchReplayData, 1000);
           }
-        }
-      }
+        });
     }
 
     function initializePlayer(videoId, startTime) {
@@ -66,13 +59,20 @@
           end: parseInt(startTime) + 8
         },
         events: {
-          'onReady': onPlayerReady
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
         }
       });
     }
 
     function onPlayerReady(event) {
       event.target.setVolume(0);
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data == YT.PlayerState.ENDED) {
+        document.getElementById('player').style.display = 'none';
+      }
     }
 
     var tag = document.createElement('script');
@@ -82,19 +82,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
