@@ -1,0 +1,61 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Replay</title>
+</head>
+<body>
+    <h1>Controle de Replay</h1>
+    <form id="replayForm">
+        <label for="videoId">YouTube Video ID:</label>
+        <input type="text" id="videoId" name="videoId" required>
+        <br><br>
+        <label for="startTime">Start Time (em segundos):</label>
+        <input type="number" id="startTime" name="startTime" required>
+        <br><br>
+        <button type="submit">Iniciar Replay</button>
+    </form>
+
+    <script>
+        document.getElementById('replayForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const videoId = document.getElementById('videoId').value;
+            const startTime = document.getElementById('startTime').value;
+
+            const response = await fetch('api/start-replay.json', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${your_token}`  // Certifique-se de remover o token antes do commit
+                },
+                body: JSON.stringify({ videoId, startTime })
+            });
+
+            if (response.ok) {
+                alert('Replay iniciado com sucesso!');
+            } else {
+                alert('Erro ao iniciar o replay.');
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

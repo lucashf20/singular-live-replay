@@ -1,5 +1,4 @@
 {
-    "youtubeId": null,
-    "startTime": null
-  }
-  
+  "videoId": "YOUR_VIDEO_ID",
+  "startTime": "YOUR_START_TIME"
+}

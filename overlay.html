@@ -1,84 +1,34 @@
+<!-- overlay.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Overlay</title>
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      background: transparent;
-    }
-    #player {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay de Replay</title>
 </head>
 <body>
-  <div id="player"></div>
+    <div id="replayContainer"></div>
 
-  <script>
-    let player;
-    const overlayURL = 'https://lucashf20.github.io/singular-live-replay/api/start-replay.json';
+    <script>
+        async function fetchReplayData() {
+            const response = await fetch('api/start-replay.json');
+            if (response.ok) {
+                const data = await response.json();
+                const videoId = data.videoId;
+                const startTime = data.startTime;
 
-    function onYouTubeIframeAPIReady() {
-      fetchReplayData();
-    }
-
-    function fetchReplayData() {
-      fetch(overlayURL)
-        .then(response => response.json())
-        .then(data => {
-          if (data.youtubeId) {
-            initializePlayer(data.youtubeId, data.startTime);
-          } else {
-            setTimeout(fetchReplayData, 1000);
-          }
-        });
-    }
-
-    function initializePlayer(videoId, startTime) {
-      player = new YT.Player('player', {
-        height: '100%',
-        width: '100%',
-        videoId: videoId,
-        playerVars: {
-          autoplay: 1,
-          controls: 0,
-          modestbranding: 1,
-          loop: 1,
-          mute: 1,
-          start: startTime,
-          end: parseInt(startTime) + 8
-        },
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange
+                const replayContainer = document.getElementById('replayContainer');
+                replayContainer.innerHTML = `
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}?start=${startTime}&autoplay=1&loop=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                `;
+            } else {
+                console.error('Erro ao buscar dados de replay.');
+            }
         }
-      });
-    }
 
-    function onPlayerReady(event) {
-      event.target.setVolume(0);
-    }
-
-    function onPlayerStateChange(event) {
-      if (event.data == YT.PlayerState.ENDED) {
-        document.getElementById('player').style.display = 'none';
-      }
-    }
-
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  </script>
+        fetchReplayData();
+        setInterval(fetchReplayData, 8000); // Atualizar a cada 8 segundos
+    </script>
 </body>
 </html>
+
