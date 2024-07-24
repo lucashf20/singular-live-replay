@@ -3,7 +3,7 @@ name: Update Replay Data
 on:
   workflow_dispatch:
     inputs:
-      youtubeId:
+      videoId:
         description: 'YouTube Video ID'
         required: true
       startTime:
@@ -13,26 +13,20 @@ on:
 jobs:
   update-replay:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-
-    - name: Create start-replay.json
+    - name: Update start-replay.json
       run: |
-        echo "{\"youtubeId\": \"${{ github.event.inputs.youtubeId }}\", \"startTime\": \"${{ github.event.inputs.startTime }}\"}" > api/start-replay.json
+        echo "{\"videoId\": \"${{ github.event.inputs.videoId }}\", \"startTime\": ${{ github.event.inputs.startTime }}}" > api/start-replay.json
 
     - name: Commit and push changes
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add api/start-replay.json
-        git commit -m "Atualizar start-replay.json"
-        git push "https://${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:main
+        git commit -m "Update replay data"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
